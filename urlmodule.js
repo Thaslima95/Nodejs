@@ -4,7 +4,7 @@ var q = url.parse(adr, true);
 
 console.log(q.host); //returns 'localhost:8009'
 console.log(q.pathname); //returns '/urlmodule.htm'
-console.log(q.search); //returns '?ategory=nodejs&type=3'
+console.log(q.search); //returns '?category=nodejs&type=3'
 
-var qdata = q.query; 
+var qdata = q.query;
 console.log(qdata.category);

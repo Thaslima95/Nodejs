@@ -1,8 +1,8 @@
 //using http modules
-var http = require('http');//includes a http module // built in module
-var url=require('url');//url module
+const http = require('http');//includes a http module // built in module
+const url=require('url');//url module
 //import another user defined modules
-var greet=require('./ownModule');
+const greet=require('./ownModule');
 
 http.createServer(function (req, res)//method used to create HTTP server
  {
@@ -15,8 +15,8 @@ http.createServer(function (req, res)//method used to create HTTP server
 //   res.write(greet.ownModule());
 //   res.write(req.url);
 //   res.end();
-   var params = url.parse(req.url, true).query;
-  var txt = params.name + " " + params.category;
+   const params = url.parse(req.url, true).query;
+  const txt = params.name + " " + params.category;
   res.end(txt);
 }).listen(8080);
 console.log("server started");
