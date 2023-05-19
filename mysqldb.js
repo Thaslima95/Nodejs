@@ -416,13 +416,60 @@ con.connect(function(err){
 // })
 
 //RIGHT JOIN
-const sql="SELECT o.Order_Id,e.LastName,e.FirstName FROM orders as o RIGHT JOIN Employees as e ON o.EmployeeID=e.EmpId ORDER BY o.Order_Id"
+// const sql="SELECT o.Order_Id,e.LastName,e.FirstName FROM orders as o RIGHT JOIN Employees as e ON o.EmployeeID=e.EmpId ORDER BY o.Order_Id"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+//Produce same result as INNER JOIN
+
+// const sql="SELECT c.Customer_Name,o.Order_Id FROM CustomerInfo as c CROSS JOIN orders as o WHERE c.Customer_Id=o.CustomerId"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+//create supplier table
+// const sql="CREATE TABLE Suppliers (Supplier_ID INT AUTO_INCREMENT PRIMARY KEY,Supplier_Name VARCHAR(255),City VARCHAR(255),Country VARCHAR(255))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Supplier Table Created")
+// })
+
+// const sql="INSERT INTO Suppliers (Supplier_Name,City,Country) VALUES ?"
+// const values=[
+//     ['Exotic Liquid','Berlin','Germany'],
+//     ['Tokyo Traders','Hanover','UK'],
+//     ["Mayumi's",'Marseilli','France'],
+//     ['Pavlova Liquid','Frankfurt','London'],
+//     ['Specialty Biscuits','alfred','UK'],
+
+// ]
+// con.query(sql,[values],function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(`Rows Inserted ${result.affectedRows}`)
+// })
+
+//UNION
+// const sql="SELECT City FROM CustomerInfo UNION SELECT City FROM Suppliers"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+//UNION ALL
+const sql="SELECT City FROM CustomerInfo UNION ALL SELECT City FROM Suppliers"
 con.query(sql,function(err,result)
 {
     if(err) throw err;
     console.log(result)
 })
-
 
 
 
