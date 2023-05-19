@@ -375,8 +375,7 @@ con.connect(function(err){
 //     console.log(result)
 // })
 
-//RIGHT JOIN
-// const sql="SELECT c.Customer_Name,c.Custome"
+
 
 
 // const sql="INSERT INTO Employees (LastName,FirstName) VALUES ?"
@@ -464,12 +463,14 @@ con.connect(function(err){
 // })
 
 //UNION ALL
-const sql="SELECT City FROM CustomerInfo UNION ALL SELECT City FROM Suppliers"
-con.query(sql,function(err,result)
-{
-    if(err) throw err;
-    console.log(result)
-})
+// const sql="SELECT City FROM CustomerInfo UNION ALL SELECT City FROM Suppliers"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+
 
 
 
