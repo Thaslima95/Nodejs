@@ -20,7 +20,7 @@ http.createServer(function (req, res) {
 //   console.log('Write Sucess');
 // });
 
-// fs.open('file3.txt', 'w+', function (err, file) {
+// fs.open('file2.txt', 'w+', function (err, file) {
 //   if (err) throw err;
 //   console.log('Write Sucess');
 // });
@@ -32,7 +32,7 @@ http.createServer(function (req, res) {
 //   console.log('Replace sucess!');
 // });
 
-fs.unlink('file3.txt', function (err) {
-  if (err) throw err;
-  console.log('File has been deleted sucessfully!');
-});
+// fs.unlink('file3.txt', function (err) {
+//   if (err) throw err;
+//   console.log('File has been deleted sucessfully!');
+// });

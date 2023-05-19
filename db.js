@@ -125,6 +125,7 @@ con.connect(function(err) {
 // console.log("Table created");  
 // }); 
 
+
 // const sql = "INSERT INTO customers (name, product_purchased) VALUES ?";
 //   const values = [
 //     ['Johny', 'DELL'],

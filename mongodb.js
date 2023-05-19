@@ -1,14 +1,3 @@
-// const MongoClient = require('mongodb').MongoClient;
-// console.log("inside mongo")
-// const url = "mongodb://localhost:27017/mydb";
-// console.log("after mongo");
-
-// MongoClient.connect(url, function(err, db) {
-//     console.log("inside function")
-//   if (err) throw err;
-//   console.log("Database created!");
-//   db.close();
-// });
 
 const express=require('express');
 
@@ -18,7 +7,7 @@ require('dotenv').config;
 //middlewares
 const app=express();
 
-mongoose.connect("mongodb+srv://admin:aafiya@cluster0.nomsigp.mongodb.net/?retryWrites=true&w=majority");
+mongoose.connect("mongodb+srv://admin:aafiya@EKART.nomsigp.mongodb.net/EKART");
 
 app.listen(process.env.PORT,()=>{
     console.log("Backend Sever")
@@ -45,4 +34,4 @@ const prodcutsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("ProductsTable", prodcutsSchema);
+module.exports = mongoose.model("NewTable", prodcutsSchema);
