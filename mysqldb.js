@@ -470,17 +470,141 @@ con.connect(function(err){
 //     console.log(result)
 // })
 
+//Practicing questions from website
+// const sql="CREATE TABLE countries (country_id INT AUTO_INCREMENT PRIMARY KEY,country_name VARCHAR(255),region_id INT )";
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("countries tables created")
+// })
+
+// const sql="CREATE TABLE IF NOT EXISTS countries (country_id INT AUTO_INCREMENT PRIMARY KEY,country_name VARCHAR(255),region_id INT )"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("table created")
+// })
+
+// const sql="CREATE TABLE IF NOT EXISTS dup_countries (country_id INT AUTO_INCREMENT PRIMARY KEY,country_name VARCHAR(255),region_id decimal(10,2))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Duplicate table created")
+// })
+
+//create duplicate copy of countries including structure and data
+// const sql="CREATE TABLE IF NOT EXISTS dup_name AS SELECT * FROM countries"
+// con.query(sql,function(err,result){
+//     if(err) throw err;
+//     console.log("table created")
+// })
+
+// const sql="CREATE TABLE IF NOT EXISTS duplicate_countries (country_id INT AUTO_INCREMENT PRIMARY KEY,country_name VARCHAR(255) NOT NULL,region_id decimal(10,2) NOT NULL)"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table created")
+// })
+
+//Create a table countries, and make sure that no countries except Italy, India and China will be entered in the table
+// const sql="CREATE TABLE IF NOT EXISTS countries (country_id INT AUTO_INCREMENT PRIMARY KEY,country_name VARCHAR(255) CHECK (country_name IN ('ITALY','INDIA','CHINA')),region_id decimal(10,2))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table created")
+// })
+
+//INSERT 
+// const sql="INSERT INTO countries (country_name,region_id) VALUES ?"
+// const values=[
+//     ['India','1001'],
+//     ['Italy','1002'],
+//     ['China','1004']
+// ]
+// con.query(sql,[values],function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(`Inserted Rows ${result.affectedRows}`)
+// })
+
+//create a table with duplicate sturcture and entries of countires
+// const sql="CREATE TABLE IF NOT EXISTS countrys_new AS SELECT * FROM countries"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+// / Insert one row in jobs table to ensure that no duplicate value will be entered in the job_id column
+// const sql="CREATE TABLE IF NOT EXISTS jobs (Job_id INT NOT NULL,Job_title VARCHAR(255) NOT NULL,MIN_SALARY decimal(6,0))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table created")
+// })
+
+// const sql="INSERT INTO jobs (Job_id,Job_title,MIN_SALARY) VALUES (1001,'Developer',100.00)"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(`Inserted Rows ${result.affectedRows}`)
+// })
+
+//DEFAULT
+// const sql="CREATE TABLE IF NOT EXISTS countries (country_id INT AUTO_INCREMENT PRIMARY KEY,country_name VARCHAR(255) DEFAULT 'N/A')"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table created")
+// })
+
+//Foreign key constraint
+// const sql="CREATE TABLE IF NOT EXISTS job_hsitory (job_id INT NOT NULL UNIQUE PRIMARY KEY,job_title VARCHAR(255) NOT NULL DEFAULT ' ' ,Min_salary decimal(10,0))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table Created")
+// })
+
+//DROP TABLE
+// const sql="DROP TABLE  IF EXISTS job_history"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table deleted")
+// })
+
+//creating job_history table with foreign key constraint
+// const sql="CREATE TABLE IF NOT EXISTS job_history (job_id INT NOT NULL PRIMARY KEY,job_title VARCHAR(255),min_slary decimal(10,0),FOREIGN KEY (job_id) REFERENCES jobs(Job_id)) "
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table created")
+// })
 
 
+//ALTER TABLE 
+// const sql="ALTER TABLE jobs MODIFY COLUMN Job_id INT NOT NULL PRIMARY KEY"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table Altered")
+// })
 
+//ALTER TABLE
+// const sql="ALTER TABLE job_history ADD COLUMN Employee_id INT NOT NULL UNIQUE "
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("altered table")
+// })
 
-
-
-
-
-
-
-
+const sql="CREATE TABLE IF NOT EXISTS Departments (Department_Id INT NOT NULL UNIQUE,Department_name VARCHAR(255),Manager_Id INT NOT NULL,Location_Id INT DEFAULT NULL,PRIMARY KEY (Department_Id,Manager_Id))"
+con.query(sql,function(err,result)
+{
+    if(err) throw err;
+    console.log("Table created")
+})
 
 
 
