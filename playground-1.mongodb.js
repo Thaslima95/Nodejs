@@ -61,10 +61,24 @@ use('EKART')
 
 
 
-db.Products.deleteMany({quantity:'5'})
+db.Products.deleteMany({quantity:5})
 
+db.Products.find({})
 
+db.Products.updateOne({name:"Acer"},{$set:{quantity:12}})
 
+db.Products.updateOne({name:"Tuf Gaming"},{$set:{quantity:11}})
+
+//upsert insert the document if not found
+db.Products.updateOne({name:"Dell Inspiron"},{
+  $set:{
+    name:"Dell Inspiron",
+    price:1006,
+    quantity:18,
+    date:Date()
+  }
+},
+{upsert:true})
 
 
 

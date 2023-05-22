@@ -606,6 +606,199 @@ con.connect(function(err){
 //     console.log("Table created")
 // })
 
+// const sql="SELECT Count(country_Id),country_name FROM countries GROUP BY country_name"
+// con.query(sql,function(err,result){
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+// const sql="CREATE TABLE IF NOT EXISTS Shippers (Shipper_id INT AUTO_INCREMENT PRIMARY KEY,Shipper_Name VARCHAR(255),PHONE VARCHAR(20))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table created")
+// })
+
+
+//INSERT 
+// const sql="INSERT INTO Shippers (Shipper_Name,PHONE) VALUES ?"
+// const values=[
+//     ['Speedy Express','(503) 555-9831'],
+//     ['United Package','(503) 555-3199'],
+//     ['Federal Shipping','(503) 555-9931'],
+// ]
+// con.query(sql,[values],function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(`Rows inserted ${result.affectedRows}`)
+    
+// })
+
+// const sql="SELECT * FROM orders"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+// const sql="ALTER TABLE orders ADD COLUMN Shipper_Id INT NOT NULL"
+// con.query(sql,function(err,result){
+//     if(err) throw err;
+//     console.log("Table altered")
+// })
+
+
+// const sql="UPDATE orders SET Shipper_Id=3 WHERE EmployeeID IS NULL"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(`No of rows affected ${result.affectedRows}`)
+// })
+
+// const sql="UPDATE orders SET Shipper_Id=2 WHERE EmployeeID IN ('3','4')"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(`No of rows affected ${result.affectedRows}`)
+// })
+
+//Group BY with JOINS
+// const sql="SELECT Count(o.Order_id) ,s.Shipper_Name FROM orders as o LEFT JOIN Shippers as s ON o.Shipper_Id=s.Shipper_id GROUP BY s.Shipper_Name"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+//Having
+// const sql="SELECT Count(o.Order_id),s.Shipper_Name FROM orders as o INNER JOIN Shippers as s ON o.Shipper_Id=s.Shipper_id  GROUP BY s.Shipper_Name HAVING count(o.Order_id)>=3"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+
+// const sql="SELECT count(Customer_Id),Country FROM CustomerInfo GROUP BY Country HAVING count(Customer_Id)>=2"
+// con.query(sql,function(err,result){
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+// const sql="ALTER TABLE products ADD COLUMN Supplier_Id INT"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table Altered")
+// })
+
+// const sql="UPDATE products SET Supplier_Id=5 WHERE Product_Id IN ('6','7')"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+
+//WHERE EXISTS
+// const sql="SELECT Supplier_Name FROM Suppliers WHERE EXISTS (SELECT Product_Name FROM products WHERE products.Supplier_Id=Suppliers.Supplier_ID)"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+
+//ANY AND ALL
+//ANY returns true any of the condition matches
+//ALL returns true only if all the condition matches
+
+// const sql="SELECT Supplier_Name FROM Suppliers WHERE Supplier_ID= ANY (SELECT Supplier_Id FROM products WHERE Price>40)"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+// const sql="SELECT Supplier_Name FROM Suppliers WHERE Supplier_ID= ALL (SELECT Supplier_Id FROM products WHERE Price > 20)"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+
+//INSERT SELECT
+// const sql="CREATE TABLE customer (Customer_Name VARCHAR(255),City VARCHAR(255),Country VARCHAR(255))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("table created")
+// })
+// const sql="INSERT INTO customer (Customer_Name,City,Country) (SELECT Customer_Name,City,Country FROM CustomerInfo)"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(`No of rows inserted ${result.affectedRows}`)
+// })
+
+
+//CASE STATEMENT
+// const sql="SELECT Product_Name,Price ,CASE WHEN Price >40 THEN 'Price is too high' WHEN Price < 20 THEN 'Price is too Low' ELSE 'Price is Moderate' END AS PriceRange FROM products"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+//NULL FUnctions
+//IFNULL,COALESCE
+
+
+//SOME
+// const sql="SELECT * FROM products WHERE Price > SOME (SELECT Price FROM products WHERE Price > 30)"
+// con.query(sql,function(err,result){
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+
+//CHECK
+// const sql="CREATE TABLE PersonsInfo (Person_Id INT AUTO_INCREMENT PRIMARY KEY,Person_Name VARCHAR(255) NOT NULL ,Age INT, CHECK (Age>=19))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Tables created wiith check constraint")
+// })
+
+//DROP CONSTRAINT
+//ALTER TABLE TABLE NAME DROP CONSTRAINT(CHECK,PRIMARY KEY,FOREIGN KEY,CHECK,DEFAULT) constraint_name if have
+
+//WITHOUT INDEX
+// const sql="EXPLAIN SELECT * FROM products WHERE Price=10"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+
+//With Index
+//Create Index
+// const sql="CREATE INDEX prices ON products(Price)"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Index created")
+// })
+
+// const sql="EXPLAIN SELECT * FROM products WHERE Price=10"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
 
 
 
