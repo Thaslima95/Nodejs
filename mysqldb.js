@@ -599,12 +599,12 @@ con.connect(function(err){
 //     console.log("altered table")
 // })
 
-const sql="CREATE TABLE IF NOT EXISTS Departments (Department_Id INT NOT NULL UNIQUE,Department_name VARCHAR(255),Manager_Id INT NOT NULL,Location_Id INT DEFAULT NULL,PRIMARY KEY (Department_Id,Manager_Id))"
-con.query(sql,function(err,result)
-{
-    if(err) throw err;
-    console.log("Table created")
-})
+// const sql="CREATE TABLE IF NOT EXISTS Departments (Department_Id INT NOT NULL UNIQUE,Department_name VARCHAR(255),Manager_Id INT NOT NULL,Location_Id INT DEFAULT NULL,PRIMARY KEY (Department_Id,Manager_Id))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table created")
+// })
 
 
 

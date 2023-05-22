@@ -61,7 +61,7 @@ use('EKART')
 
 
 
-db.Products.deleteMany({name:''})
+db.Products.deleteMany({quantity:'5'})
 
 
 
