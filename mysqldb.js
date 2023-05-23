@@ -144,6 +144,9 @@ con.connect(function(err){
 // })
 
 
+//Modify
+//ALTER TABLE TABLENAME MODIFY COLUMN COLUMNANME NEWDATATYPE
+
 //Insert values into product table
 // const sql="INSERT INTO products (Product_Name,Price) VALUES ?"
 // const values=[
@@ -212,8 +215,15 @@ con.connect(function(err){
 //     console.log(result)
 // })
 
-// const sql="SELECT * FROM CustomerInfo WHERE Customer_Name LIKE '%b___'"
+// const sql="SELECT * FROM CustomerInfo WHERE Customer_Name LIKE '%b___%'"
 // con.query(sql,function(err,result){
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+// const sql="SELECT * FROM CustomerInfo WHERE Customer_Name REGEXP '^b.*el$'"
+// con.query(sql,function(err,result)
+// {
 //     if(err) throw err;
 //     console.log(result)
 // })
@@ -262,14 +272,14 @@ con.connect(function(err){
 //     console.log(result)
 // })
 
-// const sql="SELECT Customer_Name,Country FROM CustomerInfo WHERE Country BETWEEN 'London' AND 'UK'"
+// const sql="SELECT Customer_Name,Country FROM CustomerInfo WHERE Country BETWEEN 'London' AND 'UK' ORDER BY Country"
 // con.query(sql,function(err,result)
 // {
 //     if(err) throw err;
 //     console.log(result)
 // })
 
-// const sql="SELECT Customer_Name,City,Country FROM CustomerInfo WHERE Country NOT BETWEEN 'London' AND 'UK'"
+// const sql="SELECT Customer_Name,City,Country FROM CustomerInfo WHERE Country NOT BETWEEN 'London' AND 'UK' ORDER BY Country"
 // con.query(sql,function(err,result){
 //     if(err) throw err;
 //     console.log(result)
@@ -751,6 +761,8 @@ con.connect(function(err){
 //     console.log(result)
 // })
 
+
+
 //NULL FUnctions
 //IFNULL,COALESCE
 
@@ -797,6 +809,139 @@ con.connect(function(err){
 // {
 //     if(err) throw err;
 //     console.log(result)
+// })
+
+
+//ALTER TABLE TABLENAME ADD COULMUN COUMUNNAME DATA TYPE
+//ALTER TABLE TABLENAME DROP COLUMN COLUMNNAME
+//ALTER TABLE TABLENAME MODIFY COULUMN COUMNNAME DATATYPE
+
+
+//constraints on alter table
+//ALTER TABLE TABLENAME MODIFY COLUMNNAME DATATYPE CONSTRAINT(NOT NULL)
+//UNIQUE
+//ALTER TABLE TABLENAME ADD UNIQUE(COLUMNNAME)
+//Combination
+//ALTER TABLE TABLENAME ADD CONTRAINT constraint_name UNIQUE(COLUMN1,COLUMN2)
+
+//DROP UNIQUE 
+//ALTER TABLE TABLENAME DROP INDEX CONTRAINT NAME
+
+//PRIMARY KEY
+//CREATE TABLE TABLE NAME COLUMNS WITH DATATYPE,PRIMARY KEY (COLUMN NAME)
+//Combination CONSTRAINt constraint_name PRIMARY KEY(COLUMN1,COLUMN2)
+//ALTER TABLE TABLENAME ADD PRIMARY KEY (COLUMNNAME)
+//ALTER TABLE TABLENAME ADD CONSTRAINT constraint_name PRIMARY KEY (COLUMN1,COLUMN2)
+//ALTER TABLE DROP PRIMARY KEY
+
+
+//FOREIGN KEY
+//CREATE TABLE TABLE NAME COLUMNANME WITH DATATYPE,FOREIGN KEY (COLUMNANME in TABLE 1) REFERENCES TABLE2NAME(COLUMNNAME(PRIMARY KEY COLUMN) in table2)
+//CONSTRAINT CONSTRAINTANME FOREIGN KEY (COLUMNNAME in Table 1) REFERENCES TABLE2NAME(COULUMNNAME(PRIMARYKEY COLUMN) in Table 2)
+//ALTER TABLE TABLENAME ADD FOREIGN KEY (COLUMNNAME in TABLE 1) REFRENCES TABLENAME(COLUMNNAME(PRIMARY KEY COLUM) in Table 2)
+//ALTER TABLE TABLENAME ADD CONSTRAINT CONSTRAINTNAME FORIGN KEY (COLUMNNAME IN TABLE1) REFERENCES TABLE2NAME(COLUMNNAME(PRIMARY KEY COLUMN) in TABLE 2)
+//ALTER TABLE DROP FOREIGN KEY contraint_name
+
+//DEFAULT
+//CREATE TABLE TABLENAME COUMNNAMES WITH DATATYPE DEFAULT VALUE
+//ALTER TABLE TABLENAME ALTER COLUMNNAME SET DEFAULT 'VALUE'
+//ALTER TABLE TABLENAME ALTER COLUMNNAME SET DEFAULT
+
+// const sql="ALTER TABLE Suppliers ADD UNIQUE(Supplier_Name)"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Altered ")
+// })
+
+// const sql="SELECT * FROM Suppliers"
+// con.query(sql,function(err,result,fields)
+// {
+//     if(err) throw err;
+//     console.log(fields)
+// })
+// const sql="ALTER TABLE Suppliers DROP INDEX Supplier_Name"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Contraint dropped")
+// })
+
+// const sql="SHOW INDEX FROM Suppliers"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+//REGEXP
+// const sql="SELECT Customer_Name FROM CustomerInfo WHERE Customer_Name REGEXP '^[aboum].*o$'"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+
+//handling Duplicates
+// const sql="SELECT Count(*) as Duplicates, Customer_Name,City,Country FROM Customer GROUP BY Customer_Name,City,Country HAVING Duplicates > 1"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+//Removing duplicates while querying
+// const sql="SELECT DISTINCT Customer_Name,City,Country FROM Customer"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result)
+// })
+
+// const sql="ALTER  TABLE Customer ADD PRIMARY KEY (Customer_Name, City, Country)"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Altered")
+// })//throwing err
+
+
+// const sql="CREATE TABLE CustomerDetails (Customer_Id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(255),address VARCHAR(255))"
+// con.query(sql,function(err,result)
+// {
+//     if(err) throw err;
+//     console.log("Table created")
+// })
+
+// const sql="INSERT INTO CustomerDetails (name,address) VALUES ?"
+// const values=[
+//     ['Willia','Central st'],
+// [ 'Viola','Sideway 1633'  ],
+// [ 'Vicky','Yellow Garde ' ],
+// [ 'Susan','One way 98'  ],
+// [ 'Sandy','Ocean blvd 2'] ,   
+// [ 'Richa ','Sky st 331'],
+// [ 'Peter','Lowstreet 4'],
+//  [ 'Mich ','Valley 345a'],
+//  [ 'John','igheay 71'],
+//   ['Hann','Mountain 21a'],
+//  [ 'Chuc','Main Road 98k'],
+//  [ 'Bett','Green Grass y'],
+//  [ 'Ben','rk Lane 38'],
+//  [ 'Amy','ple st 652']
+// ]
+// con.query(sql,[values],function(err,result)
+// {
+//     if(err) throw err;
+//     console.log(result.affectedRows)
+// })
+
+
+// const sql="SELECT * FROM CustomerDetails ORDER BY address DESC"
+// con.query(sql,function(err,result)
+// {
+// if(err) throw err;
+// console.log(result)
 // })
 
 
