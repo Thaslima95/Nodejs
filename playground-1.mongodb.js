@@ -428,14 +428,192 @@ db.peaks.updateOne({"ascents.first":{year:1953}},{$inc:{"acsents.first.year":1}}
 
 
 
+//lookup
+db.posts.insertMany([{
+    "title" : "my first post",
+    "author" : "Jim",
+    "likes" : 5
+},
+{
+    "title" : "my second post",
+    "author" : "Jim",
+    "likes" : 2
+},
+{
+    "title" : "hello world",
+    "author" : "Joe",
+    "likes" : 3
+},
+{
+    "title" : "have a nice day",
+    "author" : "Johny",
+    "likes" : 7
+
+}])
+
+
+db.comments.insertMany([
+    {
+    "postTitle" : "my first post",
+    "comment" : "great read",
+    "likes" : 3
+},
+ {
+    "postTitle" : "my first post",
+    "comment" : "Nice shared",
+    "likes" : 5
+},
+{
+    "postTitle" : "my second post",
+    "comment" : "good info",
+    "likes" : 0
+},
+{
+    "postTitle" : "my second post",
+    "comment" : "i liked this post",
+    "likes" : 12
+},
+{
+    "postTitle" : "hello world",
+    "comment" : "not my favorite",
+    "likes" : 8
+},
+{
+    "postTitle" : "my last post",
+    "comment" : null,
+    "likes" : 0
+}
+])
+
+db.posts.aggregate([
+    {
+        $lookup:{
+            from:"comments",
+            localField:"title",
+            foreignField:"postTitle",
+            as:"Feeds",
+            pipeline:[
+                {
+                    $project:{
+            "title":1,
+            "comment":1,
+            "_id":0
+        }
+                }
+            ]
+        }
+        
+    }
+  
+    
+])
+db.posts.find().pretty()
+
+//$and
+db.peaks.find()
+
+db.peaks.find({$and:[{"name":"Everest"},{"ascents.first.year":1953}]})
+
+//$or
+db.peaks.find({$or:[{"name":"Makalu"},{"ascents.total":{$in:[283,461]}}]})
+
+//$and and $or together
+db.peaks.find({$and:[{"location":"India"},{$or:[{"ascents.first_winter.year":{$gt:2000}},{"height":{$lt:8600}}]}]})
+
+
+//$nor:
+//return documents both query fails to match
+db.peaks.find({$nor:[{"name":"Everest"},{"height":8586}]})
+
+
+//$not:
+//return documents where the query doesn't match
+db.peaks.find({"height":{$not:{$gt:8500}}})
 
 
 
+//update only updates the first document that matches the condition
+db.posts.update({"author":"Jim"},{$inc:{likes:2}})
+db.posts.find()
+//update with multi
+//with multi true updates all the document that matches the conditiond
+db.posts.update({"author":"Jim"},{$inc:{likes:1}},{multi:true})
+
+//findoneandUpdate()
+db.posts.findOneAndUpdate({_id:ObjectId("646d8b7491255b9bf473f671")},{$set:{"title":"New Post","author":"Chikku"}})
 
 
+db.posts.insertMany([{"title":"Test post","author":"bebefin","likes":3},{"title":"Walking Walking","author":"bebefin","likes":5}])
+
+db.posts.find()
+
+//remove()
+db.posts.remove({"author":"bebefin"})
+
+//remove only one
+db.posts.remove({"author":"bebefin"},1)//doubt
+
+//similiar to truncate
+db.posts.remove({})//remove all the document from collection
+
+db.posts.find()
+//Limit 
+db.posts.find({}).limit(2)
+
+//limit and skip
+db.posts.find({}).limit(2).skip(2)//skip it will skip the first 2 documents in collection and display next documents present in collection.
 
 
+//creating multiple index
+db.posts.createIndex({"author":1,"likes":-1})
 
+//dopping multiple indexex
+db.posts.dropIndexes({"author":1,"likes":-1})
+
+//show indexe
+db.posts.getIndexes()
+
+//aggregation
+db.posts.aggregate([
+    {$group:{
+        _id:"$author",
+        num_ofPost:{
+        $sum:1
+    }
+    }
+
+}
+])
+
+db.comments.aggregate([
+    {
+        $group:{
+            _id:"$postTitle",
+            numofComments:{
+                $sum:1
+            }
+        }
+    }
+])
+
+db.posts.find()
+
+db.posts.updateOne({"author":"Johny"},{$set:{likes:1}})
+db.posts.aggregate([
+    {
+        $group:{
+            _id:"$title",
+            maxlikes:{
+                $min:"$likes"
+            }
+        }
+    }
+])
+
+db.sales.find()
+
+
+//above code to mysql  select by_user, count(*) from mycol group by by_user.
 
 
 
