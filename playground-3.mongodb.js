@@ -15,7 +15,13 @@ use('mongodbVSCodePlaygroundDB');
 
 db.movies.find()
 
+db.theaters.find()
+
+db.sessions.find()
+
 db.getCollectionInfos()
+
+db.users.find()
 
 db.comments.find()
 
@@ -58,16 +64,14 @@ db.movies.aggregate([
       "_id":0,
       title:1,
       "CommentSection.text":1,
-      "CommentSection.name":1
+      "CommentSection.name":1,
+      
     },
    
     
   },
  {
-    $group: {
-      _id:null,
-      count:{$sum:"$CommentSection"},
-    }
+   $count:"CommentSection"
   },
   // {
   //   $match: {
@@ -80,17 +84,223 @@ db.movies.aggregate([
 
 
 
+db.comments.aggregate([
+  {
+    $lookup:{
+      from:"movies",
+      localField:"movie_id",
+      foreignField:"_id",
+      as:"CommentSection"
+    }
+  },
+ {
+  $unwind:{
+    path:"$CommentSection"
+  }
+ }
+  
+])
+
+db.comments.aggregate([
+  {
+    $lookup:{
+      from:"movies",
+      localField:"movie_id",
+      foreignField:"_id",
+      as:"CommentSection"
+    }
+  },
+  {
+    $project:{
+      "_id":0,
+      "CommentSection.title":1,
+      text:1,
+      name:1
+    },
+   
+    
+  },
+  {
+    $limit:3
+  }
+])
+
 db.movies.aggregate([
     {
         $group:{
             _id:"$type"  ,
             minrating:{$min:"$imdb.rating"},
-            
+            "title":{"$first":"$title"}
             
         },      
     } 
   
 ])
+
+db.movies.aggregate([
+  {
+    $group:{
+      _id:"$type",
+      "minrating":{$min:"$imdb.rating"},
+      "title":{
+        "$firstN":{
+          input:"$title",
+          n:3
+        }
+      }
+    }
+  }
+])
+
+
+
+db.comments.find()
+
+
+db.comments.aggregate([
+  {
+    $match:{"_id":ObjectId("5a9427648b0beebeb69579e7")}
+  },{
+    $lookup:{
+      from:"movies",
+      localField:"movie_id",
+      foreignField:'_id',
+      as:"CommentSection"
+    }
+  },
+  {
+    $project:{
+      _id:0,
+      name:1,
+      text:1,
+      "CommentSection.title":1
+    }
+  }
+])
+
+db.comments.find({},{text:1,_id:0})
+
+//$unwind Deconstructs an array field from the input documents to 
+//output a document for each element.
+// Each output document is the input document with the value of the array field replaced by the element.
+
+
+db.movies.aggregate([
+  {
+    $lookup:{
+      from:"comments",
+      localField:"_id",
+      foreignField:'movie_id',
+      as:"CommentSection"
+    }
+  },
+  {
+$unwind:"$CommentSection"
+  },
+  {
+      $replaceRoot: { newRoot: { $mergeObjects: [ "$CommentSection", "$$ROOT" ] } }
+   },
+  {
+    $project:{
+      _id:0,
+     title:1,
+      text:1,
+      name:1
+    }
+  }
+])
+
+
+db.orders.insertMany( [
+   { "_id" : 1, "item" : "almonds", "price" : 12, "quantity" : 2 },
+   { "_id" : 2, "item" : "pecans", "price" : 20, "quantity" : 1 }
+] )
+
+db.items.insertMany( [
+  { "_id" : 1, "item" : "almonds", description: "almond clusters", "instock" : 120 },
+  { "_id" : 2, "item" : "bread", description: "raisin and nut bread", "instock" : 80 },
+  { "_id" : 3, "item" : "pecans", description: "candied pecans", "instock" : 60 }
+] )
+
+db.orders.aggregate([
+  {
+    $lookup:{
+      from:"items",
+      localField:"item",
+      foreignField:"item",
+      as:"ItemSection"
+    }
+  },
+  {
+      $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$ItemSection", 0 ] }, "$$ROOT" ] } }
+   },
+   { $project: { ItemSection: 0,
+  instock:0 } }
+])
+
+db.ordersnew.insertMany( [
+  { "_id" : 1, "item" : "almonds", "price" : 12, "ordered" : 2 },
+  { "_id" : 2, "item" : "pecans", "price" : 20, "ordered" : 1 },
+  { "_id" : 3, "item" : "cookies", "price" : 10, "ordered" : 60 }
+] )
+
+
+db.warehouses.insertMany( [
+  { "_id" : 1, "stock_item" : "almonds", warehouse: "A", "instock" : 120 },
+  { "_id" : 2, "stock_item" : "pecans", warehouse: "A", "instock" : 80 },
+  { "_id" : 3, "stock_item" : "almonds", warehouse: "B", "instock" : 60 },
+  { "_id" : 4, "stock_item" : "cookies", warehouse: "B", "instock" : 40 },
+  { "_id" : 5, "stock_item" : "cookies", warehouse: "A", "instock" : 80 }
+] )
+
+
+
+db.ordersnew.aggregate([
+  {
+    $lookup:{
+      from:"warehouses",
+      let:{'order_item':'$item','order_quantity':'$ordered'},
+      pipeline:[
+        {
+          $match:{
+            $expr:{
+              $and:[
+                {$eq:['$stock_item','$$order_item']},
+                {$gte:['instock','$$order_quantity']}
+              ]
+            }
+          }
+        }
+      ],
+      as:"StockList"
+    }
+  },
+  {
+    $unwind:"$StockList"
+  },{
+    $replaceRoot:{newRoot:{$mergeObjects:['$StockList','$$ROOT']}
+  }
+},{
+  $project:{
+    StockList:0,
+    stock_item:0,
+  }
+}
+])
+
+
+
+db.movies.find({title:"The Forsyte Saga"})
+db.movies.aggregate([
+  {
+    $match:{
+      "imdb.rating":{$eq:3.9}
+    }
+  }
+])
+
+
+
 
 
 
