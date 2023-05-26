@@ -156,7 +156,7 @@ db.movies.aggregate([
 
 db.comments.find()
 
-
+//$lookup with $project
 db.comments.aggregate([
   {
     $match:{"_id":ObjectId("5a9427648b0beebeb69579e7")}
@@ -288,9 +288,434 @@ db.ordersnew.aggregate([
 }
 ])
 
+//$unmid:
+//unwind array
+
+//based on array values document will be separated
+db.inventory.insertOne({ "_id" : 1, "item" : "ABC1", sizes: [ "S", "M", "L"] })
 
 
-db.movies.find({title:"The Forsyte Saga"})
+db.inventory.aggregate([
+  {
+    $unwind:"$sizes"
+  }
+])
+
+//unwind array with null values
+db.clothing.insertMany([
+  { "_id" : 1, "item" : "Shirt", "sizes": [ "S", "M", "L"] },
+  { "_id" : 2, "item" : "Shorts", "sizes" : [ ] },
+  { "_id" : 3, "item" : "Hat", "sizes": "M" },
+  { "_id" : 4, "item" : "Gloves" },
+  { "_id" : 5, "item" : "Scarf", "sizes" : null }
+])
+
+
+db.clothing.aggregate([
+  {
+    $unwind:"$sizes"
+  }
+])
+//it will eliminate the records with empty array
+//to get the records with empty array and null.
+//set true to second field preserveNullAndEmptyArrays to true
+
+db.clothing.aggregate([
+  {
+    $unwind:{
+      path:"$sizes",
+      preserveNullAndEmptyArrays:true
+    }
+  }
+])
+
+//Group by unwound values
+
+db.inventory2.insertMany([
+  { "_id" : 1, "item" : "ABC", price: NumberDecimal("80"), "sizes": [ "S", "M", "L"] },
+  { "_id" : 2, "item" : "EFG", price: NumberDecimal("120"), "sizes" : [ ] },
+  { "_id" : 3, "item" : "IJK", price: NumberDecimal("160"), "sizes": "M" },
+  { "_id" : 4, "item" : "LMN" , price: NumberDecimal("10") },
+  { "_id" : 5, "item" : "XYZ", price: NumberDecimal("5.75"), "sizes" : null }
+])
+
+
+db.inventory2.aggregate([
+  {
+    $unwind:{
+      path:"$sizes",
+      preserveNullAndEmptyArrays:true
+    }
+  },
+  {
+    $group:{
+      _id:"$sizes",
+      avgPrice:{$avg:"$price"}
+    }
+  },
+  {
+    $sort:{
+      avgPrice:-1
+    }
+  }
+])
+
+//Unwind Embedded Arrays
+
+db.salesData.insertMany([
+  {
+    _id: "1",
+    "items" : [
+     {
+      "name" : "pens",
+      "tags" : [ "writing", "office", "school", "stationary" ],
+      "price" : NumberDecimal("12.00"),
+      "quantity" : NumberInt("5")
+     },
+     {
+      "name" : "envelopes",
+      "tags" : [ "stationary", "office" ],
+      "price" : NumberDecimal("19.95"),
+      "quantity" : NumberInt("8")
+     }
+    ]
+  },
+  {
+    _id: "2",
+    "items" : [
+     {
+      "name" : "laptop",
+      "tags" : [ "office", "electronics" ],
+      "price" : NumberDecimal("800.00"),
+      "quantity" : NumberInt("1")
+     },
+     {
+      "name" : "notepad",
+      "tags" : [ "stationary", "school" ],
+      "price" : NumberDecimal("14.95"),
+      "quantity" : NumberInt("3")
+     }
+    ]
+  }
+])
+
+db.salesData.aggregate([
+  //first satge unwind based on items 
+  {
+    $unwind:"$items"
+  }
+])
+
+db.salesData.aggregate([
+  {
+    $unwind:"$items"
+  },
+  //second stage unwind based on each tags inside items
+  {
+    $unwind:"$items.tags"
+  }
+])
+
+
+db.salesData.aggregate([
+  {
+    $unwind:"$items"
+  },
+  {
+    $unwind:"$items.tags"
+  },
+  //third stage grouping by values of tags and calculated the total sale based on each tags
+  {
+    $group:{
+      _id:"$items.tags",
+      totalSale:{$sum:{$multiply:['$items.price','$items.quantity']}},
+     "items":{
+      "$firstN":{
+        input:"$items.name",
+        n:4
+      }
+     }
+    }
+  }
+])
+
+//$push:
+//The $push operator appends a specified value to an array.
+db.inventory3.insertMany([
+  { "_id" : 1, "item" : "ABC", price: NumberDecimal("80"), "sizes": [ "S", "M", "L"] },
+  { "_id" : 2, "item" : "EFG", price: NumberDecimal("120"), "sizes" : [ ] },
+  { "_id" : 3, "item" : "IJK", price: NumberDecimal("160"), "sizes":[ "M"] },
+  { "_id" : 4, "item" : "LMN" , price: NumberDecimal("10") },
+  { "_id" : 6, "item" : "ABC", price: NumberDecimal("50"), "sizes": [ "S", "M"] },
+ { "_id" : 7, "item" : "ABC", price: NumberDecimal("50"), "sizes": [ "M","L"] }
+])
+
+db.inventory3.drop()
+
+//$push values in multiple documents
+db.inventory3.updateMany({},{$push:{"sizes":"x"}})
+
+
+//$push with $each modifier
+db.inventory3.updateMany({"item":"ABC"},{$push:{"sizes":{$each:['xs','xl']}}})
+
+
+//Use $push Operator with Multiple Modifiers
+db.students.insertOne(
+   {
+      "_id" : 5,
+      "quizzes" : [
+         { "wk": 1, "score" : 10 },
+         { "wk": 2, "score" : 8 },
+         { "wk": 3, "score" : 5 },
+         { "wk": 4, "score" : 6 }
+      ]
+   }
+)
+
+
+db.students.updateOne(
+  {
+    _id:5
+  },
+  {
+    $push:{
+      quizzes:{
+        $each:[{"wk":5,"score":12},{"wk":6,"score":14},{"wk":7,"score":16}],
+        $sort:{score:-1},
+        $slice:4
+      }
+    }
+  },
+  
+)
+
+//update with multiple modofiers with upsert true
+db.students.updateOne({_id:6},{
+  $push:{
+    quizess:{
+      $each:[{"wk":1,"score":3},{"wk":2,"score":7}],
+      $sort:{score:1},
+      $slice:4
+    }
+  }
+},{
+  upsert:true
+})
+
+
+//Aggregation pipeline step by step
+db.cities.insertMany([
+    {"name": "Seoul", "country": "South Korea", "continent": "Asia", "population": 25.674 },
+    {"name": "Mumbai", "country": "India", "continent": "Asia", "population": 19.980 },
+    {"name": "Lagos", "country": "Nigeria", "continent": "Africa", "population": 13.463 },
+    {"name": "Beijing", "country": "China", "continent": "Asia", "population": 19.618 },
+    {"name": "Shanghai", "country": "China", "continent": "Asia", "population": 25.582 },
+    {"name": "Osaka", "country": "Japan", "continent": "Asia", "population": 19.281 },
+    {"name": "Cairo", "country": "Egypt", "continent": "Africa", "population": 20.076 },
+    {"name": "Tokyo", "country": "Japan", "continent": "Asia", "population": 37.400 },
+    {"name": "Karachi", "country": "Pakistan", "continent": "Asia", "population": 15.400 },
+    {"name": "Dhaka", "country": "Bangladesh", "continent": "Asia", "population": 19.578 },
+    {"name": "Rio de Janeiro", "country": "Brazil", "continent": "South America", "population": 13.293 },
+    {"name": "São Paulo", "country": "Brazil", "continent": "South America", "population": 21.650 },
+    {"name": "Mexico City", "country": "Mexico", "continent": "North America", "population": 21.581 },
+    {"name": "Delhi", "country": "India", "continent": "Asia", "population": 28.514 },
+    {"name": "Buenos Aires", "country": "Argentina", "continent": "South America", "population": 14.967 },
+    {"name": "Kolkata", "country": "India", "continent": "Asia", "population": 14.681 },
+    {"name": "New York", "country": "United States", "continent": "North America", "population": 18.819 },
+    {"name": "Manila", "country": "Philippines", "continent": "Asia", "population": 13.482 },
+    {"name": "Chongqing", "country": "China", "continent": "Asia", "population": 14.838 },
+    {"name": "Istanbul", "country": "Turkey", "continent": "Europe", "population": 14.751 }
+])
+
+//find vs match
+
+db.cities.find({})
+
+db.cities.aggregate([
+  {
+    $match:{}
+  }
+])
+
+db.cities.find({"continent":"South America"})
+
+db.cities.aggregate([
+  {
+    $match:{
+      continent:"South America"
+    }
+  }
+])
+
+db.cities.find({continent:{$in:['South America','Asia']}})
+
+db.cities.aggregate([
+  {
+    $match:{
+      continent:{
+        $in:['South America','Asia']
+      }
+    }
+  }
+])
+
+
+db.cities.find().sort({continent:-1})
+
+db.cities.aggregate([
+  {
+    $sort:{
+      continent:-1
+    }
+  }
+])
+
+//$match and $sort
+db.cities.aggregate([
+  {
+    $match:{
+      continent:{
+        $in:['South America','North America']
+      }
+    }
+  },
+  {
+    $sort:{
+      continent:-1
+    }
+  }
+])
+
+//$group
+
+db.cities.aggregate([
+  {
+    $group:{
+      _id:"$continent"
+    }
+  }
+])
+
+
+//multifields in group
+
+db.cities.aggregate([
+  {
+    $group:{
+      _id:{
+        "continent":"$continent",
+        "country":"$country"
+      }
+    }
+  }
+])
+
+db.cities.aggregate([
+  {
+    $group:{
+      _id:{
+      "continent":"$continent",
+      "country":"$country"
+      },
+      "firstCity":{$first:"$name"},
+      "highestPopulation":{$max:"$population"}
+    }
+  }
+])
+
+db.cities.aggregate([
+  {
+        $match: {
+            "continent": { $in: ["North America", "Asia"] }
+        }
+    },
+    {
+        $sort: { "population": -1 }
+    },
+  {
+    $group:{
+      _id:{
+      "continent":"$continent",
+      "country":"$country"
+      },
+      "highestPopulation":{$max:"$population"},
+      "firstCity":{$first:"$name"},
+      
+    }
+  }
+])
+
+
+
+
+db.students.find()
+
+
+
+db.inventory3.find()
+
+
+
+
+
+
+
+db.movies.find()
+
+db.movies.find({title:"Hannah Montana & Miley Cyrus: Best of Both Worlds Concert"})
+
+db.movies.createIndex({"imdb.rating":1})
+
+db.movies.aggregate([
+  {
+    $match:{
+      type:{$in:['movie','series']}
+    }
+  },
+  {
+    $sort:{
+      "imdb.rating":1
+    }
+  },
+  {
+    $group:{
+      _id:"$type",
+      "title":{$first:"$title"},
+      "minRating":{$min:"$imdb.rating"}
+    }
+  },
+
+
+],{ "allowDiskUse" : true })
+
+db.movies.aggregate([
+  {
+    $match:{
+      type:{$in:['movie','series']}
+    }
+  },
+  {
+    $sort:{
+      "imdb.rating":1
+    }
+  },
+  {
+    $group:{
+      _id:"$type",
+      "title":{
+        "$firstN":{
+          input:"$title",
+          n:40
+        }
+      },
+      "minRating":{$min:"$imdb.rating"}
+    }
+  },
+
+
+],{ "allowDiskUse" : true })
+
 db.movies.aggregate([
   {
     $match:{

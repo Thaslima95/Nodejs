@@ -162,13 +162,13 @@ db.peaks.find({location:{$in:['Pakistan','India']}})
 
 db.peaks.find({location:{$ne:['Pakistan','China']}})
 
-//implicit and operator
+//implicit $and operator
 db.peaks.find(
     { "name": "Everest", "height": 8848 }
 )
 
 
-//explicit and operator
+//explicit $and operator
 db.peaks.find({$and:[{"name":"Lhotse"},{"height":8516}]})
 
 
@@ -236,6 +236,52 @@ db.peaks.insertOne({
     }
 })
 
+
+db.peaks.insertOne({
+    "name": "Sillicon Valley",
+    "height": 4500,
+    "location": ["India"],
+    "ascents": {
+        "first": {
+            "year": 2010
+        },
+        "first_winter": {
+            "year": 2011
+        },
+        "total": 10
+    }
+})
+
+db.peaks.insertOne({
+    "name": "Himalaiya",
+    "height": 4500,
+    "location": ["India"],
+    "ascents": {
+        "first": {
+            "year": 2010
+        },
+        "first_winter": {
+            "year": 2011
+        },
+        "total": 10
+    }
+})
+
+db.peaks.insertOne({
+    "name": "Himalaiya",
+    "height": 4500,
+    "location": ["India"],
+    "ascents": {
+        "first": {
+            "year": 1990
+        },
+        "first_winter": {
+            "year": 1997
+        },
+        "total": 10
+    }
+})
+
 //creating index for nested documents
 db.peaks.createIndex({"ascents.total":1})
 
@@ -243,6 +289,32 @@ db.peaks.find({"ascents.total":{$gte:400}}).sort({"ascents.total":-1}).explain("
 
 //listing and removing indexes
 db.peaks.getIndexes()
+
+
+
+
+db.peaks.find()
+
+//if you dont specify the justOneflag value 
+//it will deletes all the record matches the condition
+db.peaks.remove({"name":"Sillicon Valley"})
+
+
+//with justOne
+
+db.peaks.remove({"name":"Himalaiya"},true)
+
+//Removes all the document
+db.peaks.remove({})
+//not recommended now to use remove due to it was deprecated.
+//instead use other functions
+
+//$and
+db.peaks.find({$and:[{'name':'Lhotse'},{'height':8516}]})
+
+
+
+
 
 db.peaks.dropIndex({"height":1})
 
@@ -366,8 +438,12 @@ db.cities.aggregate([
     }
 ])
 
-//Array Operators
+
 db.getCollectionInfos()
+
+db.peaks.find()
+
+
 
 
 
@@ -400,6 +476,10 @@ db.peaks.updateMany({},{$set:{'Direction':'East'}})
 
 db.peaks.updateMany({name:{$in:['Lhotse','K2']}},{$set:{'Direction':'West'}})
 
+//findOneAndUpdate
+db.peaks.findOneAndUpdate({"name":"Lhotse"},{$set:{"height":9000}})
+
+
 //upsert
 db.peaks.updateOne({name:"Mount Everest"},{$set:{
     name:"Mt Everest",
@@ -411,6 +491,8 @@ db.peaks.updateOne({name:"Mount Everest"},{$set:{
     },
     locations:['Pakistan','Indonesia']
 }},{upsert:true})
+
+db.peaks.find()
 
 db.peaks.updateOne({name:'Mt Everest'},{$set:{height:6700}})
 //$unset
@@ -507,6 +589,16 @@ db.posts.aggregate([
   
     
 ])
+
+db.cities.count()
+db.cities.find({}).skip(15)
+
+db.cities.aggregate([
+    {
+        $skip:15
+    }
+])
+
 db.posts.find().pretty()
 
 //$and
@@ -556,16 +648,31 @@ db.posts.remove({"author":"bebefin"},1)//doubt
 //similiar to truncate
 db.posts.remove({})//remove all the document from collection
 
+
+//projection
+db.peaks.find({},{name:1})
+
+//to hide _id:
+db.peaks.find({},{_id:0,name:1})
+
+
 db.posts.find()
 //Limit 
 db.posts.find({}).limit(2)
 
 //limit and skip
-db.posts.find({}).limit(2).skip(2)//skip it will skip the first 2 documents in collection and display next documents present in collection.
+db.posts.find({}).limit(2).skip(2)
+//skip it will skip the first 2 documents in collection and
+// display next documents present in collection.
 
+//create Index 1 denotes ascending order -1 denotes descdng order
+db.posts.createIndex({"author":1})
 
 //creating multiple index
 db.posts.createIndex({"author":1,"likes":-1})
+
+//drop Index
+db.posts.dropIndex({"author":1})
 
 //dopping multiple indexex
 db.posts.dropIndexes({"author":1,"likes":-1})
@@ -596,7 +703,7 @@ db.comments.aggregate([
     }
 ])
 
-db.posts.find()
+db.posts.find({},{author:1})
 
 db.posts.updateOne({"author":"Johny"},{$set:{likes:1}})
 db.posts.aggregate([
@@ -814,7 +921,7 @@ db.articles.aggregate([
     }
 ])
 
-//Converting ObjectId to String
+
 
 
 
