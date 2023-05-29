@@ -48,8 +48,69 @@ db.movies.aggregate([
       as:"CommentSection"
     }
   },
+  {
+    $match:{
+CommentSection:{$ne:[]}
+    }
+  },
+  {
+    $project:{
+      title:1,
+      _id:0,
+       comments:{$mergeObjects:"$CommentSection"}
+    }
+  }
 ])
 
+
+db.movies.aggregate([
+  {
+    $lookup:{
+      from:"comments",
+      localField:"_id",
+      foreignField:"movie_id",
+      as:"CommentSection"
+    }
+  },
+  {
+     $match:{
+      CommentSection:{$ne:[]}
+     }
+  },
+  {
+    $project:{
+      _id:0,
+      title:1,
+      "CommentSection.text":1,
+      "CommentSection.name":1
+    }
+  }
+])
+
+
+db.movies.aggregate([
+  {
+    $lookup:{
+      from:"comments",
+      localField:"_id",
+      foreignField:"movie_id",
+      as:"CommentSection"
+    }
+  },
+  {
+     $match:{
+      CommentSection:{$ne:[]}
+     }
+  },
+  {
+    $project:{
+      _id:0,
+      title:1,
+      comments:{$mergeObjects:"$CommentSection"}
+     
+    }
+  }
+])
 db.movies.aggregate([
   {
     $lookup:{
@@ -288,7 +349,7 @@ db.ordersnew.aggregate([
 }
 ])
 
-//$unmid:
+//$unwind:
 //unwind array
 
 //based on array values document will be separated
@@ -339,7 +400,7 @@ db.inventory2.insertMany([
   { "_id" : 5, "item" : "XYZ", price: NumberDecimal("5.75"), "sizes" : null }
 ])
 
-
+//Group by unwound values
 db.inventory2.aggregate([
   {
     $unwind:{
@@ -399,6 +460,9 @@ db.salesData.insertMany([
   }
 ])
 
+db.salesData.find()
+//Unwind Embedded Arrays
+
 db.salesData.aggregate([
   //first satge unwind based on items 
   {
@@ -452,15 +516,20 @@ db.inventory3.insertMany([
 
 db.inventory3.drop()
 
+db.inventory3.find()
+
 //$push values in multiple documents
 db.inventory3.updateMany({},{$push:{"sizes":"x"}})
 
+db.inventory3.find()
 
 //$push with $each modifier
 db.inventory3.updateMany({"item":"ABC"},{$push:{"sizes":{$each:['xs','xl']}}})
 
 
-//Use $push Operator with Multiple Modifiers
+db.students.drop()
+
+
 db.students.insertOne(
    {
       "_id" : 5,
@@ -473,7 +542,9 @@ db.students.insertOne(
    }
 )
 
+db.students.find()
 
+//Use $push Operator with Multiple Modifiers
 db.students.updateOne(
   {
     _id:5
@@ -482,12 +553,10 @@ db.students.updateOne(
     $push:{
       quizzes:{
         $each:[{"wk":5,"score":12},{"wk":6,"score":14},{"wk":7,"score":16}],
-        $sort:{score:-1},
-        $slice:4
+        $sort:{score:1},
       }
     }
-  },
-  
+  }, 
 )
 
 //update with multiple modofiers with upsert true
@@ -656,9 +725,50 @@ db.students.find()
 db.inventory3.find()
 
 
+db.grades.drop()
 
+//$map aggregation
+db.grades.insertMany([
+  { "_id" : 1, "name" : "dave123", Marks: [ 90, 80, 75, 84 ] },
+{ "_id" : 2, "name" : "li", Marks: [ 100, 70, 65, 84 ]  },
+{ "_id" : 3, "name" : "ahn", Marks: [ 89, 80, 75, 48 ] },
+{ "_id" : 4, "name" : "ty", Marks: [ 59, 60, 75, 98 ]  },
+])
 
+db.grades.find()
 
+//Each array value is increased by 2 using $map aggregation
+db.grades.aggregate([
+  {
+    $project:{
+      updatedMarks:{
+        $map:{
+          input:"$Marks",//denotes array name
+          as:"mark",//denotes each array value
+          in:{$add:["$$mark",2]//which operation to be performed in map aggregation
+
+          }
+        }
+      }
+    }
+  }
+])
+
+db.grades.aggregate([
+  {
+    $project:{
+      name:"$name",
+      updatedMarks:{
+        $map:{
+          input:"$Marks",
+          as:"mark",
+          in:{$multiply:["$$mark",3]}
+          
+        }
+      }
+    }
+  }
+])
 
 
 db.movies.find()
@@ -723,6 +833,194 @@ db.movies.aggregate([
     }
   }
 ])
+
+//$mergeObjects
+
+db.usersInfo.insertMany([
+  {
+	"_id" : 1,
+	"name" : {
+		"first_name" : "Aafiya",
+		"last_name" : "Thasnim"
+	},
+	"contact" : {
+		"email" : "aafiya@ample.com",
+		"ph" : null
+	}
+}
+])
+
+db.usersInfo.find()
+
+//$mergeObjects
+//merge the two objects into (name & contact)
+db.usersInfo.aggregate([
+  {
+    $project:{
+      usersInfo:{
+        $mergeObjects:["$name","$contact"]
+      }
+    }
+  }
+])
+
+
+//Duplicate values
+
+db.usersInfo.insertMany([
+  {
+	"_id" : 2,
+	"name" : {
+		"first_name" : "Aafiya",
+		"last_name" : "Thasnim"
+	},
+	"contact" : {
+		"email" : "aafiya@ample.com",
+		"first_name":"Nizamudeen"
+	}
+}
+])
+
+//$mergeObjects with duplicate values
+db.usersInfo.aggregate([
+  {
+      $match:{_id:2}
+  },
+  {
+    $project:{
+      usersInfo:{
+        $mergeObjects:["$name","$contact"]
+      }
+    }
+  }
+])
+
+//Null values
+db.usersInfo.insertMany([
+  {
+	"_id" : 3,
+	"name" : {
+		"first_name" : "Aafiya",
+		"last_name" : "Thasnim"
+	},
+	"contact" : null
+}
+])
+
+db.usersInfo.insertMany([
+  { "_id" : 4, "name" : null, "contact" : null }
+])
+
+
+db.usersInfo.aggregate([
+  {
+    $match:{_id:{$in:[3,4]}}
+  },
+  {
+    $project:{
+
+      usersInfo:{
+        $mergeObjects:["$name","$contact"]
+      }
+    }
+  }
+])
+
+
+
+
+db.products.insertMany([
+  {
+	"_id" : 1,
+	"product" : "Shirt",
+	"inventory" : {
+		"blue" : 10,
+		"red" : 2
+	}
+},
+{
+	"_id" : 2,
+	"product" : "Shirt",
+	"inventory" : {
+		"green" : 3,
+		"black" : 1
+	}
+},
+{
+	"_id" : 3,
+	"product" : "Shorts",
+	"inventory" : {
+		"blue" : 2,
+		"red" : 8
+	}
+},
+{
+	"_id" : 4,
+	"product" : "Shorts",
+	"inventory" : {
+		"green" : 5,
+		"black" : 3
+	}
+}
+])
+
+
+db.products.aggregate([
+  {
+    $group:{_id:"$product",
+      mergedObject:{$mergeObjects:"$inventory"}
+  }
+  }
+])
+
+
+db.test.insertMany([
+  {
+	"_id" : 1,
+	"data" : [
+		{
+			"a" : 1,
+			"b" : 2
+		},
+		{
+			"c" : 3,
+			"d" : 4
+		}
+	]
+}
+])
+
+//merging array of objects
+db.test.aggregate([
+  {
+    $project:{
+      resultData:{$mergeObjects:"$data"}
+    }
+  }
+])
+
+
+
+//Missing Fields
+
+db.usersInfo.aggregate([
+  {
+    $project:{
+      usersInfo:{$mergeObjects:["$name","$address"]}
+      //we dont have address object in usersInfo collection
+    }
+  }
+])
+
+
+
+db.usersInfo.deleteOne({_id:3})
+
+
+db.usersInfo.find()
+
+
+
 
 
 

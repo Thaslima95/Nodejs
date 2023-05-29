@@ -674,7 +674,7 @@ db.posts.createIndex({"author":1,"likes":-1})
 //drop Index
 db.posts.dropIndex({"author":1})
 
-//dopping multiple indexex
+//dropping multiple indexex
 db.posts.dropIndexes({"author":1,"likes":-1})
 
 //show indexe
